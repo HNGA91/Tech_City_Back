@@ -6,7 +6,8 @@ API REST du projet e-commerce **Tech City**, développée avec Node.js / Express
 
 ## 👤 Auteur
 
-**Hervé N'Goma**
+**Louis-Hervé N'Goma** — Développeur Full Stack
+GitHub : [@HNGA91](https://github.com/HNGA91)
 
 ---
 
@@ -244,7 +245,6 @@ Plusieurs mécanismes de sécurité sont mis en œuvre :
 
 ## 📄 Licence
 
-Ce projet est sous licence **MIT**.
-Toute réutilisation doit mentionner l'auteur original.
+© 2026 Louis-Hervé N'Goma — Tous droits réservés.
 
-> ⚠️ Toute reproduction ou présentation de ce projet comme étant le vôtre sans attribution constitue une violation de la licence.
+Ce projet est publié à titre de démonstration dans le cadre de mon portfolio. Le code peut être consulté librement, mais aucune réutilisation, modification ou distribution n'est autorisée sans mon accord écrit. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
