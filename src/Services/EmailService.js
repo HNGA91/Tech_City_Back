@@ -1,16 +1,18 @@
 // Service centralisé pour l'envoi d'emails via l'API Resend (HTTP)
-// On utilise l'API HTTP plutôt que le SMTP classique car Railway bloque/limite
-// fortement les connexions SMTP sortantes (confirmé : timeout sur Gmail SMTP),
-// alors que les appels HTTPS classiques ne posent aucun problème.
+// On utilise l'API HTTP plutôt que le SMTP classique car les hébergeurs gratuits
+// (Render notamment) bloquent les connexions SMTP sortantes (ports 25, 465, 587),
+// alors que les appels HTTPS ne posent aucun problème.
 const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Adresse d'expéditeur : tant qu'aucun domaine perso n'est authentifié sur Resend,
-// on utilise leur adresse de test "onboarding@resend.dev" qui fonctionne sans configuration DNS.
-// ATTENTION : en mode sandbox (pas de domaine vérifié), Resend n'autorise l'envoi
-// QUE vers l'adresse email associée au compte Resend utilisé pour la clé API.
-const EXPEDITEUR = "Tech City <onboarding@resend.dev>";
+// Adresse d'expéditeur, fournie par la variable d'environnement EMAIL_FROM.
+// - En production : "Tech City <demo-project@herve-ngoma.dev>" (domaine vérifié sur Resend,
+//   envoi possible vers n'importe quel destinataire).
+// - Valeur de repli (développement) : adresse de test "onboarding@resend.dev".
+//   ATTENTION : en mode sandbox, Resend n'autorise l'envoi QUE vers l'adresse
+//   email associée au compte Resend utilisé pour la clé API.
+const EXPEDITEUR = process.env.EMAIL_FROM || "Tech City <onboarding@resend.dev>";
 
 // Fonction utilitaire : envoie un email via l'API Resend
 // attachments (optionnel) : tableau de { name, content } où content est un Buffer
@@ -143,7 +145,7 @@ const envoyerEmailContact = async (nom, email, messageContact) => {
     `;
 
 	await envoyerEmailResend({
-		// L'email arrive dans la boîte Gmail (adresse configurée comme expéditeur)
+		// L'email arrive dans la boîte définie par EMAIL_USER (demo-project@herve-ngoma.dev en production)
 		to: process.env.EMAIL_USER,
 		subject: `[Contact] Message de ${nom}`,
 		html,

@@ -12,11 +12,15 @@
 	"author": "",
 	"license": "UNLICENSED",
 	"type": "commonjs",
+	"engines": {
+		"node": "22.x"
+	},
+	"packageManager": "pnpm@10.26.0",
 	"dependencies": {
 		"bcrypt": "^6.0.0",
-		"bcryptjs": "^3.0.3",
 		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
+		"dotenv": "^18.0.6",
 		"express": "^5.1.0",
 		"express-rate-limit": "^8.5.2",
 		"helmet": "^8.2.0",
@@ -24,7 +28,6 @@
 		"mongoose": "^8.20.0",
 		"multer": "^2.2.0",
 		"mysql2": "^3.22.3",
-		"nodemailer": "^9.0.3",
 		"pdfkit": "^0.19.1",
 		"resend": "^6.17.2",
 		"sequelize": "^6.37.8",
@@ -32,7 +35,6 @@
 		"stripe": "^22.3.1"
 	},
 	"devDependencies": {
-		"dotenv": "^17.2.3",
 		"jest": "^30.4.2",
 		"nodemon": "^3.1.14",
 		"supertest": "^7.2.2"

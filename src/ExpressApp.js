@@ -16,6 +16,12 @@ const contactRoutes = require("./Routes/Contact");
 
 const app = express();
 
+// L'application tourne derrière le proxy de Render, qui ajoute l'IP réelle du
+// visiteur dans l'en-tête X-Forwarded-For. On ne fait confiance qu'au premier
+// proxy (1) : req.ip devient l'IP du visiteur, ce dont express-rate-limit a besoin,
+// sans croire un X-Forwarded-For falsifié par le client. Sans effet en local.
+app.set("trust proxy", 1);
+
 // Liste des origines autorisées à appeler le backend :
 // - l'URL de développement local (toujours utile pour continuer à coder en local)
 // - l'URL de production, définie via la variable d'environnement FRONTEND_URL

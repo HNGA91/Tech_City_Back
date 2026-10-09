@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: [".env.local", ".env"] });
 
 const fs = require("fs");
 const http = require("http");
