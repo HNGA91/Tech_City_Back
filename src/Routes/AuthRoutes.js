@@ -17,12 +17,29 @@ const MAX_ATTEMPTS = 3; // Nombre max de tentatives avant blocage
 const LOCK_DURATION = 15; // Durée du blocage en minutes
 const REFRESH_TOKEN_EXPIRY = 7; // Durée de vie du Refresh Token en jours
 
+// Options communes du cookie de refresh token, partagées par res.cookie() et
+// res.clearCookie() : un navigateur n'efface un cookie que si les options de
+// suppression correspondent à celles de sa création.
+// Le front (tech-city.herve-ngoma.dev) et l'API (api-tech-city.herve-ngoma.dev)
+// appartiennent au même site (herve-ngoma.dev) : "lax" suffit, et bloque l'envoi
+// du cookie depuis d'autres sites (protection CSRF).
+const REFRESH_COOKIE_OPTIONS = {
+	httpOnly: true, // Inaccessible depuis JavaScript (protège contre le vol par XSS)
+	secure: true, // Envoyé uniquement en HTTPS (mkcert en local, Render en production)
+	sameSite: "lax", // "lax" : cookie envoyé pour les requêtes venant du même site, et lors d'une
+	// simple navigation (clic sur un lien) depuis un autre site ; jamais pour une
+	// requête POST/fetch déclenchée par un site tiers → protection CSRF.
+};
+
 // =============== FONCTIONS UTILITAIRES ===============
 
 // Récupère l'IP réelle du client
-// x-forwarded-for est utilisé quand le serveur est derrière un proxy/nginx
+// req.ip est calculé par Express à partir de X-Forwarded-For en ne faisant confiance
+// qu'au proxy de Render (app.set("trust proxy", 1) dans ExpressApp.js).
+// Lire directement le PREMIER élément de X-Forwarded-For serait dangereux : le client
+// peut le remplir lui-même avec une fausse IP et contourner le blocage anti-brute-force.
 const getClientIp = (req) => {
-	const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+	const ip = req.ip;
 	// Normaliser ::1 (IPv6 localhost) en 127.0.0.1 (IPv4 localhost)
 	return ip === "::1" ? "127.0.0.1" : ip;
 };
@@ -227,10 +244,7 @@ router.post("/connexion", async (req, res) => {
 
 		// 7. Envoyer le Refresh Token dans un cookie HTTP-only sécurisé
 		res.cookie("refreshToken", refreshToken, {
-			httpOnly: true, // Inaccessible depuis JavaScript
-			secure: true, // HTTPS obligatoire aussi bien en dev qu'en prod grâce à mkcert
-			sameSite: "none", // Protection contre les attaques CSRF (Cross-Site Request Forgery).
-            //  Cookie envoyé uniquement si la requête vient exactement du même site
+			...REFRESH_COOKIE_OPTIONS,
 			maxAge: REFRESH_TOKEN_EXPIRY * 24 * 60 * 60 * 1000,
 		});
 
@@ -300,7 +314,8 @@ router.post("/deconnexion", async (req, res) => {
 		}
 
 		// Supprimer le cookie côté client
-		res.clearCookie("refreshToken");
+		// Mêmes options qu'à la création, sinon le navigateur ne supprime pas le cookie
+		res.clearCookie("refreshToken", REFRESH_COOKIE_OPTIONS);
 		res.status(200).json({ message: "✅ Déconnexion réussie" });
 	} catch (error) {
 		res.status(500).json({ message: "Erreur serveur", error: error.message });
